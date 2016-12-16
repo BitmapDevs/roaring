@@ -515,6 +515,7 @@ func TestBitmap(t *testing.T) {
 		for i := 200000; i < 400000; i += 14 {
 			rb.AddInt(i)
 		}
+		rb.highlowcontainer.runOptimize()
 		So(andresult.GetCardinality(), ShouldEqual, 0)
 		rc := And(rb, rb2)
 		rb.And(rb2)

@@ -340,6 +340,7 @@ func (rb *Bitmap) Remove(x uint32) {
 			rb.highlowcontainer.removeAtIndex(i)
 		}
 	}
+	rb.highlowcontainer.runOptimize()
 }
 
 // CheckedRemove removes the integer x from the bitmap and return true if the integer was effectively remove (and false if the integer was not present)
@@ -460,6 +461,8 @@ main:
 		}
 	}
 	rb.highlowcontainer.resize(intersectionsize)
+
+	rb.highlowcontainer.runOptimize()
 }
 
 // OrCardinality  returns the cardinality of the union between two bitmaps, bitmaps are not modified
@@ -649,12 +652,14 @@ func (rb *Bitmap) Xor(x2 *Bitmap) {
 	if pos1 == length1 {
 		rb.highlowcontainer.appendCopyMany(x2.highlowcontainer, pos2, length2)
 	}
+	rb.highlowcontainer.runOptimize()
 }
 
 // Or computes the union between two bitmaps and stores the result in the current bitmap
 func (rb *Bitmap) Or(x2 *Bitmap) {
 	results := Or(rb, x2) // Todo: could be computed in-place for reduced memory usage
 	rb.highlowcontainer = results.highlowcontainer
+	rb.highlowcontainer.runOptimize()
 }
 
 // AndNot computes the difference between two bitmaps and stores the result in the current bitmap
@@ -718,6 +723,7 @@ main:
 		pos1++
 	}
 	rb.highlowcontainer.resize(intersectionsize)
+	rb.highlowcontainer.runOptimize()
 }
 
 // Or computes the union between two bitmaps and returns the result
@@ -765,6 +771,7 @@ main:
 	} else if pos2 == length2 {
 		answer.highlowcontainer.appendCopyMany(x1.highlowcontainer, pos1, length1)
 	}
+	answer.highlowcontainer.runOptimize()
 	return answer
 }
 
@@ -809,6 +816,7 @@ main:
 			}
 		}
 	}
+	answer.highlowcontainer.runOptimize()
 	return answer
 }
 
@@ -846,6 +854,7 @@ func Xor(x1, x2 *Bitmap) *Bitmap {
 	} else if pos2 == length2 {
 		answer.highlowcontainer.appendCopyMany(x1.highlowcontainer, pos1, length1)
 	}
+	answer.highlowcontainer.runOptimize()
 	return answer
 }
 
@@ -899,6 +908,7 @@ main:
 	if pos2 == length2 {
 		answer.highlowcontainer.appendCopyMany(x1.highlowcontainer, pos1, length1)
 	}
+	answer.highlowcontainer.runOptimize()
 	return answer
 }
 
@@ -978,6 +988,7 @@ func (rb *Bitmap) Flip(rangeStart, rangeEnd uint64) {
 			rb.highlowcontainer.insertNewKeyValueAt(-i-1, hb, rangeOfOnes(int(containerStart), int(containerLast)))
 		}
 	}
+	rb.highlowcontainer.runOptimize()
 }
 
 // FlipInt calls Flip after casting the parameters  (convenience method)
@@ -1019,6 +1030,8 @@ func (rb *Bitmap) AddRange(rangeStart, rangeEnd uint64) {
 			rb.highlowcontainer.insertNewKeyValueAt(-i-1, hb, rangeOfOnes(int(containerStart), int(containerLast)))
 		}
 	}
+
+	rb.highlowcontainer.runOptimize()
 }
 
 // RemoveRange removes the integers in [rangeStart, rangeEnd) from the bitmap.
@@ -1078,6 +1091,8 @@ func (rb *Bitmap) RemoveRange(rangeStart, rangeEnd uint64) {
 		ilast = -ilast - 1
 	}
 	rb.highlowcontainer.removeIndexRange(ifirst, ilast)
+
+	rb.highlowcontainer.runOptimize()
 }
 
 // Flip negates the bits in the given range  (i.e., [rangeStart,rangeEnd)), any integer present in this range and in the bitmap is removed,
@@ -1134,7 +1149,7 @@ func Flip(bm *Bitmap, rangeStart, rangeEnd uint64) *Bitmap {
 	}
 	// copy the containers after the active area.
 	answer.highlowcontainer.appendCopiesAfter(bm.highlowcontainer, hbLast)
-
+	answer.highlowcontainer.runOptimize()
 	return answer
 }
 
